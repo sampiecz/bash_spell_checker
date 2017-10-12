@@ -1,0 +1,40 @@
+#! /bin/sh
+
+filename=(`aspell --list < $1`)
+correct=()
+counter=1
+
+touch ~/.memory
+
+for i in ${filename[@]}
+do
+  if grep -q $i ~/.memory
+  then
+    continue
+  else
+    read -p "'$i' is mispelled. Press \"Enter\" to keep this spelling, or type a correction here: " user_input
+  fi
+
+  if [ "$user_input" = "" ]
+  then
+    echo $i >> ~/.memory
+    counter+=1
+  else
+    correct[$counter]=$user_input
+    counter+=1
+  fi
+done
+
+printf "MISPELLED:          CORRECT:\n"
+second_counter=1
+for i in ${filename[@]};
+do
+  if grep -q $i ~/.memory
+  then
+    second_counter+=1
+    continue
+  else
+    printf "%-5s %19s\n" $i ${correct[$second_counter]}
+    second_counter+=1
+  fi
+done
